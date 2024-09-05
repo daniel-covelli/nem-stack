@@ -1,15 +1,15 @@
-import mongoose from "mongoose";
-import { extendZod, zodSchema } from "@zodyac/zod-mongoose";
+import mongoose, { Schema } from "mongoose";
 
-import { z } from "zod";
+import { PostSchema } from "./post";
 
-extendZod(z);
+export const UserSchema = new Schema({
+  name: { type: String, required: true },
+  email: { type: String, required: true },
+  posts: [PostSchema],
+  likes: {
+    type: mongoose.Types.ObjectId,
+    ref: "Like",
+  },
+});
 
-export const userZodSchema = z.object({
-    name: z.string(),
-    email: z.string().email("This is not a valid email."),
-})
-
-const UserSchema = zodSchema(userZodSchema);
-
-export const User = mongoose.model('User', UserSchema);
+export const User = mongoose.model("User", UserSchema);
