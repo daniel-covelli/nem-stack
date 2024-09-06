@@ -25,12 +25,9 @@ like.post("/", validateData(likePostRequest), async (req, res) => {
   res.send(like);
 });
 
-like.get("/:id", validateSlugs(), async (req, res, next) => {
+like.get("/:id", validateSlugs, async (req, res, next) => {
   try {
-    const like = await Like.findById({ _id: req.params.id }).populate([
-      "post",
-      "user",
-    ]);
+    const like = await Like.findById(req.params.id).populate(["post", "user"]);
     res.send(like);
   } catch (err) {
     console.log(err);

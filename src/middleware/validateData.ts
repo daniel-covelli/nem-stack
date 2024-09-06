@@ -33,23 +33,21 @@ const valueSchema = z.string().refine(
 
 const slugsSchema = z.record(valueSchema);
 
-export function validateSlugs() {
-  return (req: Request, _: Response, next: NextFunction) => {
-    try {
-      slugsSchema.parse(req.params);
-      next();
-    } catch (error) {
-      if (error instanceof ZodError) {
-        const errorMessages = error.errors.map((issue: any) => {
-          console.log(issue);
-          return {
-            [issue.path]: issue.message,
-          };
-        });
-        next(new ValidationError(errorMessages));
-      } else {
-        next(error);
-      }
+export function validateSlugs(req: Request, _: Response, next: NextFunction) {
+  try {
+    slugsSchema.parse(req.params);
+    next();
+  } catch (error) {
+    if (error instanceof ZodError) {
+      const errorMessages = error.errors.map((issue: any) => {
+        console.log(issue);
+        return {
+          [issue.path]: issue.message,
+        };
+      });
+      next(new ValidationError(errorMessages));
+    } else {
+      next(error);
     }
-  };
+  }
 }

@@ -1,6 +1,6 @@
 import express, { Request } from "express";
 import { User } from "../models/user";
-import validateData from "../middleware/validateData";
+import validateData, { validateSlugs } from "../middleware/validateData";
 import { AlreadyExists, NotFoundError } from "../error";
 import { z } from "zod";
 import { Document } from "mongoose";
@@ -31,6 +31,7 @@ const userBodySchema = z.object({
 
 user
   .route("/:userId")
+  .all(validateSlugs)
   .get(async (req: UserRequest, res) => {
     res.send(req.user);
   })
@@ -64,6 +65,7 @@ const postPostRequest = z.object({
 
 user
   .route("/:userId/posts")
+  .all(validateSlugs)
   .get(async (req: UserRequest, res) => {
     if (req.user) {
       res.send(req.user.posts);
@@ -80,12 +82,14 @@ user
     }
   });
 
-user.route("/:userId/likes").get(async (req: UserRequest, res) => {
-  if (req.user) {
-    const user = await req.user.populate("likes");
-    res.send(user.likes);
-  }
-});
+user
+  .route("/:userId/likes")
+  .get(validateSlugs, async (req: UserRequest, res) => {
+    if (req.user) {
+      const user = await req.user.populate("likes");
+      res.send(user.likes);
+    }
+  });
 
 user
   .route("/")
